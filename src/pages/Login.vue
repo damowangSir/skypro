@@ -2,7 +2,7 @@
   <div class="login_div">
     <el-card class="box-card">
       <h3>大魔王外卖后台管理系统</h3>
-      <el-input v-model="acc" placeholder="请输入用户名" class="pwd_input"></el-input>
+      <el-input v-model="acc" placeholder="请输入管理员账号" class="pwd_input"></el-input>
       <el-input v-model="pwd" placeholder="请输入密码" type="password" class="pwd_input"></el-input>
       <el-button @click="clickLogin" type="primary" class="btn">登录</el-button>
     </el-card>

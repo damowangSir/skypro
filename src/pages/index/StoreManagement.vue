@@ -10,26 +10,27 @@
           <el-input v-model="ruleForm.name"></el-input>
         </el-form-item>
         <el-form-item label="店铺公告" class="notice">
-          <el-input type="textarea" v-model="ruleForm.bulletin"></el-input>
+          <el-input
+            type="textarea"
+            v-model="ruleForm.bulletin"
+            :autosize="{ minRows: 4, maxRows: 8}"
+          ></el-input>
         </el-form-item>
         <el-form-item label="商家头像" class="header">
           <el-upload
             class="avatar-uploader"
-            action="http://127.0.0.1:5000/shop/upload"
+            :action="serverupload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
           >
-            <img v-if="ruleForm.avatar" :src="img+ruleForm.avatar" class="avatar" />
+            <img v-if="ruleForm.avatar" :src="servershopimg+ruleForm.avatar" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
         <el-form-item label="店铺图片">
-          <!-- <div  class="shopimg">
-            <img  v-for="(item,index) in ruleForm.pics" :key="index" width="100%" :src='img+item' alt  />
-          </div>-->
           <el-upload
             :file-list="fileList"
-            action="http://127.0.0.1:5000/shop/upload"
+            :action="serverupload"
             list-type="picture-card"
             :on-preview="handlePictureCardPreview"
             :on-remove="handleRemove"
@@ -59,11 +60,7 @@
         </el-form-item>
         <el-form-item label="活动">
           <el-checkbox-group v-model="supports" class="name">
-            <el-checkbox label="在线支付满28减5"></el-checkbox>
-            <el-checkbox label="VC无限橙果汁全场8折"></el-checkbox>
-            <el-checkbox label="单人精彩套餐"></el-checkbox>
-            <el-checkbox label="特价饮品八折抢购"></el-checkbox>
-            <el-checkbox label="单人特色套餐"></el-checkbox>
+            <el-checkbox v-for="item in checkbox" :key='item' label="在线支付满28减5"></el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="营业时间">
@@ -83,7 +80,12 @@
 </template>
 
 <script>
-import { API_SHOP_INFO, API_SHOP_EDIT } from "@/api/apis";
+import {
+  API_SHOP_INFO,
+  API_SHOP_EDIT,
+  SERVE_UPLOAD,
+  SERVE_SHOP_IMG
+} from "@/api/apis";
 export default {
   data() {
     return {
@@ -94,12 +96,14 @@ export default {
       dialogVisible: false,
       value: [new Date(2016, 9, 10, 8, 40), new Date(2016, 9, 10, 9, 40)],
       imageUrl: "",
-      img: "http://127.0.0.1:5000/upload/shop/",
+      serverupload: SERVE_UPLOAD, //服务器上传图片接口地址
+      servershopimg: SERVE_SHOP_IMG, //服务器获取商店图片地址
       urlArr: [],
       fileList: [],
       newUrl: [],
       headflag: true,
-      isclick:true
+      isclick: true,
+      checkbox:['在线支付满28减5','VC无限橙果汁全场8折','单人精彩套餐','特价饮品八折抢购','单人特色套餐']
     };
   },
   methods: {
@@ -135,7 +139,7 @@ export default {
       // 防抖节流
       if (this.isclick == false) return;
       this.isclick = false;
-      let data = this.value.map(item => this.resolvingDate(item));
+      let date = this.value.map(item => this.resolvingDate(item));
       // console.log(this.ruleForm, data, this.newUrl, this.supports);
       API_SHOP_EDIT(
         this.ruleForm.id,
@@ -148,7 +152,7 @@ export default {
         this.ruleForm.score,
         this.ruleForm.sellCount,
         JSON.stringify(this.supports),
-        JSON.stringify(data),
+        JSON.stringify(date),
         JSON.stringify(this.newUrl)
       ).then(res => {
         if (res.data.code == 0)
@@ -184,19 +188,17 @@ export default {
     // 点击文件列表中已上传的文件时的钩子
     handlePictureCardPreview(res, file) {
       file;
-      this.dialogImageUrl = this.img + res.imgUrl;
+      this.dialogImageUrl = this.servershopimg + res.imgUrl;
       this.dialogVisible = true;
     },
     // 店铺图片上传成功后
     handleSuccessA(res) {
       // 截取出需要传给后台的图片地址
       this.newUrl = [];
-      this.fileList.push({ url: this.img + res.imgUrl });
+      this.fileList.push({ url: this.servershopimg + res.imgUrl });
       this.newUrl = this.fileList.map(item =>
         item.url.substr(item.url.lastIndexOf("/") + 1)
       );
-      // console.log(this.newUrl);
-      // console.log(this.fileList);
     }
   },
   created() {
@@ -207,7 +209,7 @@ export default {
       //遍历网址并拼接服务器地址插入this.fileList图片就可以展示出来了
       this.ruleForm.pics.forEach(val => {
         this.newUrl.push(val);
-        this.urlObj.url = this.img + val;
+        this.urlObj.url = this.servershopimg + val;
         this.fileList.push(this.urlObj);
         this.urlObj = {};
       });

@@ -1,6 +1,13 @@
 import axios from "axios"
-// 设置服务器IP地址
-axios.defaults.baseURL="http://127.0.0.1:5000"
+// 服务器IP地址
+ export const SERVE_IP='http://127.0.0.1:5000'
+//  服务器上传图片API地址0
+export const SERVE_UPLOAD=SERVE_IP+'/shop/upload'
+//服务器店铺图片地址
+export const SERVE_SHOP_IMG = SERVE_IP + '/upload/shop/'
+
+
+axios.defaults.baseURL=SERVE_IP
 
 // API：登录
 // account：账号

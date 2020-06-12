@@ -81,7 +81,7 @@ export default {
         } else {
           this.$message({
             showClose: true,
-            message: "请按格式填写",
+            message: "密码或格式错误",
             type: "error"
           });
           return false;
@@ -97,13 +97,13 @@ export default {
       // 判断密码为空时不发生axios请求
       if (this.ruleForm.oldpwd.length == 0) return;
       API_USERS_CHECKOLDPWD(this.ruleForm.oldpwd, this.id).then(res => {
-        console.log(res)
         if (res.data.code == 1) {
           this.$message({
             showClose: true,
             message: "密码不正确",
             type: "error"
           });
+          this.oldflag = false;
         } else if(res.data.code == 5001){
           this.$message({
             showClose: true,
@@ -112,7 +112,7 @@ export default {
           });
         }
         else {
-          this.oldflag = !this.oldflag;
+          this.oldflag = true;
         }
       });
     }

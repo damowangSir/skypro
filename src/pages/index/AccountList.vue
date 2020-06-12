@@ -110,6 +110,13 @@ export default {
       })
         .then(() => {
           if (this.tableData.length == 1) this.currentPage--;
+          if (localStorage.id == id)
+            return this.$message({
+              showClose: true,
+              message: "不可删除自己的账户",
+              type: "error"
+            });
+
           API_USER_DEL(id).then(res => {
             this.Rendering();
             if (res.data.code == 0) {
@@ -142,6 +149,12 @@ export default {
           type: "warning"
         });
       if (confirm("您确定要删除这些数据吗")) {
+        if (this.ids.includes(JSON.parse(localStorage.id)))
+          return this.$message({
+            showClose: true,
+            message: "不可删除自己的账户",
+            type: "error"
+          });
         API_USERS_BAT(JSON.stringify(this.ids)).then(res => {
           // 如果删除后返回的数据为空，重新渲染
           API_USER_LIST(this.currentPage, this.pageSize).then(res => {
